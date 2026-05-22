@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이리얼트립 AI 챗봇 — Kano 설문</title>
+<style>
+  :root{--ink:#1a1a2e;--muted:#6b6b7b;--line:#e7e7ef;--bg:#f6f6fb;
+    --brand:#2563eb;--brand-soft:#eff4ff;--pos:#2563eb;--neg:#b45309}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:680px;margin:0 auto;padding:20px 16px 90px}
+  .hero{background:linear-gradient(135deg,#1d4ed8,#0ea5a4);color:#fff;border-radius:20px;padding:28px 24px;margin-bottom:20px}
+  .hero h1{margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .hero p{margin:0;font-size:13.5px;opacity:.92}
+  .progress-track{height:5px;background:rgba(255,255,255,.3);border-radius:999px;margin-top:14px;overflow:hidden}
+  .progress-fill{height:100%;background:#fff;width:0;transition:width .25s}
+  .fcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+  .fname{font-size:16px;font-weight:700;margin-bottom:2px}
+  .fno{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+  .qblock{margin-top:14px}
+  .qtag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-bottom:7px}
+  .qtag.p{color:var(--pos);background:#eff4ff}
+  .qtag.n{color:var(--neg);background:#fff5e9}
+  .qtext{font-size:13.5px;margin-bottom:9px}
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:11px 14px;font-size:13.5px;
+    cursor:pointer;text-align:left;transition:.12s;color:var(--ink)}
+  .opt:active{transform:scale(.99)}
+  .opt.sel-p{border-color:var(--pos);background:#eff4ff;color:var(--pos);font-weight:600}
+  .opt.sel-n{border-color:var(--neg);background:#fff5e9;color:var(--neg);font-weight:600}
+  .split{height:1px;background:var(--line);margin:14px 0}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:20}
+  .bar-in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .prog{flex:1;font-size:12.5px;color:var(--muted)}.prog b{color:var(--ink)}
+  .submit{border:none;background:var(--brand);color:#fff;font-size:15px;font-weight:700;padding:13px 22px;border-radius:12px;cursor:pointer}
+  .submit:disabled{background:#c7c7d4;cursor:not-allowed}
+  .done{text-align:center;padding:40px 20px}
+  .done .check{width:64px;height:64px;border-radius:50%;background:#0f766e;color:#fff;font-size:32px;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+  .done h2{margin:0 0 8px;font-size:20px}.done p{color:var(--muted);font-size:14px;margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="hero">
+    <h1>마이리얼트립 AI 챗봇 기능 설문 (Kano)</h1>
+    <p>각 기능에 대해 <b>① 그 기능이 있을 때</b>와 <b>② 없을 때</b> 어떻게 느끼실지 각각 골라 주세요. 정답은 없습니다.</p>
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+  </div>
+  <div id="features"></div>
+</div>
+<div class="bar" id="bar">
+  <div class="bar-in">
+    <div class="prog" id="prog">응답 <b>0</b> / 22</div>
+    <button class="submit" id="submit" disabled>제출하기</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const ans = {}; // key: f1_p / f1_n => 0~4
+
+function render(){
+  const box=document.getElementById('features');
+  box.innerHTML = FEATURES.map((f,i)=>`
+    <div class="fcard">
+      <div class="fno">기능 ${i+1} / ${FEATURES.length}</div>
+      <div class="fname">${f.name}</div>
+      <div class="qblock">
+        <span class="qtag p">있을 때 (긍정)</span>
+        <div class="qtext">${f.pos}</div>
+        ${opts(f.id+'_p','sel-p')}
+      </div>
+      <div class="split"></div>
+      <div class="qblock">
+        <span class="qtag n">없을 때 (부정)</span>
+        <div class="qtext">${f.neg}</div>
+        ${opts(f.id+'_n','sel-n')}
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{
+    const k=o.dataset.k, v=+o.dataset.v, cls=o.dataset.cls;
+    ans[k]=v;
+    document.querySelectorAll(`.opt[data-k="${k}"]`).forEach(x=>x.classList.remove('sel-p','sel-n'));
+    o.classList.add(cls);
+    update();
+  }));
+  update();
+}
+function opts(k,cls){
+  return '<div class="opts">'+CHOICES.map(c=>
+    `<button class="opt" data-k="${k}" data-v="${c.v}" data-cls="${cls}">${c.label}</button>`).join('')+'</div>';
+}
+function update(){
+  const total=FEATURES.length*2, done=Object.keys(ans).length;
+  document.getElementById('prog').innerHTML=`응답 <b>${done}</b> / ${total}`;
+  document.getElementById('pfill').style.width=(done/total*100)+'%';
+  document.getElementById('submit').disabled = done<total;
+}
+
+document.getElementById('submit').addEventListener('click', async ()=>{
+  const btn=document.getElementById('submit'); btn.disabled=true; btn.textContent='제출 중...';
+  const pos={}, neg={};
+  FEATURES.forEach(f=>{ pos[f.id]=ans[f.id+'_p']; neg[f.id]=ans[f.id+'_n']; });
+  const { error } = await supabase.from('kano_responses').insert({
+    session:SESSION_CODE, pos:pos, neg:neg
+  });
+  if(error){ alert('제출 실패: '+error.message); btn.disabled=false; btn.textContent='제출하기'; return; }
+  document.getElementById('app').innerHTML=`
+    <div class="done"><div class="check">✓</div>
+      <h2>응답이 제출되었습니다</h2>
+      <p>소중한 의견 감사합니다.</p>
+      <p>결과는 강의 화면에서 실시간으로 확인됩니다.</p></div>`;
+  document.getElementById('bar').style.display='none';
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kano 실시간 결과 — 마이리얼트립 AI 챗봇</title>
+<style>
+  :root{--ink:#1a1a2e;--muted:#6b6b7b;--line:#e7e7ef;--bg:#f6f6fb;
+    --brand:#2563eb;--ok:#059669;--warn:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 20px 60px}
+  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+  .top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em}
+  .top .sub{font-size:13px;color:var(--muted)}
+  .live{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ok);background:#ecfdf5;padding:7px 14px;border-radius:999px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .metric .l{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .metric .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  .panel h2{margin:0 0 4px;font-size:16px;font-weight:700}
+  .panel .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+  .cv{position:relative;width:100%}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:center}
+  th{color:var(--muted);font-weight:600;font-size:12px}
+  td.name{text-align:left;font-weight:600;font-size:13px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;color:#fff;font-size:12px;font-weight:700}
+  .empty{text-align:center;padding:60px 20px;color:var(--muted)}
+  .empty .big{font-size:48px;margin-bottom:10px}
+  .ctrl{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600;color:var(--ink)}
+  .btn:hover{background:var(--bg)}
+  .hl{background:#fff7ed}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Kano 모형 실시간 결과 대시보드</h1>
+      <div class="sub">마이리얼트립 AI 챗봇 기능 분류 · 세션 <span id="sess"></span></div>
+    </div>
+    <div class="live"><span class="dot"></span>실시간 연결됨</div>
+  </div>
+
+  <div id="content"><div class="empty"><div class="big">📡</div>학생 응답을 기다리는 중입니다…<br>학생들이 제출하면 이곳에 실시간으로 집계됩니다.</div></div>
+
+  <div style="margin-top:6px" class="ctrl">
+    <button class="btn" id="demo">예시 데이터 30명 추가</button>
+    <button class="btn" id="reset">이 세션 응답 전체 삭제</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="config.js"></script>
+<script>
+document.getElementById('sess').textContent=SESSION_CODE;
+let rows=[]; let chart=null;
+
+async function fetchAll(){
+  const {data,error}=await supabase.from('kano_responses')
+    .select('*').eq('session',SESSION_CODE).order('created_at',{ascending:true});
+  if(error){console.error(error);return;}
+  rows=data||[]; draw();
+}
+supabase.channel('rt-kano')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'kano_responses'},
+    p=>{ if(p.new.session===SESSION_CODE){ rows.push(p.new); draw(); }})
+  .subscribe();
+
+// 기능별 분류 카운트 + 최종분류 + 계수
+function analyze(){
+  const res={};
+  FEATURES.forEach(f=>res[f.id]={A:0,O:0,M:0,I:0,R:0,Q:0});
+  rows.forEach(r=>{
+    FEATURES.forEach(f=>{
+      const pv=r.pos[f.id], nv=r.neg[f.id];
+      if(pv==null||nv==null) return;
+      res[f.id][classify(pv,nv)]++;
+    });
+  });
+  FEATURES.forEach(f=>{
+    const c=res[f.id];
+    // 최종분류: 최빈 (A/O/M/I/R/Q 전체에서)
+    let top=CAT_ORDER[0];
+    CAT_ORDER.forEach(k=>{ if(c[k]>c[top]) top=k; });
+    c.final=top;
+    // 계수: 분모는 A+O+M+I (R,Q 제외)
+    const denom=c.A+c.O+c.M+c.I;
+    c.sat = denom? (c.A+c.O)/denom : 0;
+    c.dissat = denom? (c.O+c.M)/denom : 0; // 표기는 음수
+    c.total = c.A+c.O+c.M+c.I+c.R+c.Q;
+  });
+  return res;
+}
+
+function draw(){
+  if(rows.length===0){
+    document.getElementById('content').innerHTML='<div class="empty"><div class="big">📡</div>학생 응답을 기다리는 중입니다…</div>';
+    return;
+  }
+  const R=analyze();
+  const counts={A:0,O:0,M:0,I:0,R:0,Q:0};
+  FEATURES.forEach(f=>counts[R[f.id].final]++);
+
+  document.getElementById('content').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="l">응답자 수</div><div class="v">${rows.length}명</div></div>
+      <div class="metric"><div class="l">당연적 기능</div><div class="v" style="color:#b45309">${counts.M}개</div></div>
+      <div class="metric"><div class="l">일원적 기능</div><div class="v" style="color:#0f766e">${counts.O}개</div></div>
+      <div class="metric"><div class="l">매력적 기능</div><div class="v" style="color:#2563eb">${counts.A}개</div></div>
+      <div class="metric"><div class="l">역품질 기능</div><div class="v" style="color:#dc2626">${counts.R}개</div></div>
+    </div>
+
+    <div class="panel"><h2>만족계수–불만족계수 (Kano 산점도)</h2>
+      <p class="hint">가로축은 불만족계수(없을 때 불만 정도), 세로축은 만족계수(있을 때 만족 정도). 사분면 위치로 품질 유형이 구분됩니다.</p>
+      <div class="cv" style="height:440px"><canvas id="scatter"></canvas></div></div>
+
+    <div class="panel"><h2>기능별 분류 집계표</h2>
+      <p class="hint">각 셀은 해당 분류로 응답한 인원입니다. 가장 많은 유형이 최종 분류가 됩니다.</p>
+      <div style="overflow-x:auto"><table>
+        <thead><tr><th style="text-align:left">AI 챗봇 기능</th>
+          <th>매력적</th><th>일원적</th><th>당연적</th><th>무관심</th><th>역품질</th><th>의심</th>
+          <th>만족계수</th><th>불만족계수</th><th>최종 분류</th></tr></thead>
+        <tbody id="tb"></tbody></table></div></div>`;
+
+  document.getElementById('tb').innerHTML=FEATURES.map(f=>{
+    const c=R[f.id], m=CAT_META[c.final];
+    return `<tr><td class="name">${f.name}</td>
+      <td>${c.A}</td><td>${c.O}</td><td>${c.M}</td><td>${c.I}</td>
+      <td>${c.R}</td><td>${c.Q}</td>
+      <td class="hl">${c.sat.toFixed(2)}</td>
+      <td class="hl">-${c.dissat.toFixed(2)}</td>
+      <td><span class="badge" style="background:${m.color}">${m.name}</span></td></tr>`;
+  }).join('');
+
+  drawScatter(R);
+}
+
+function drawScatter(R){
+  const pts=FEATURES.map((f,i)=>({x:R[f.id].dissat, y:R[f.id].sat, label:(i+1)+'. '+f.name, cat:R[f.id].final}));
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById('scatter'),{type:'scatter',
+    data:{datasets:[{data:pts,
+      backgroundColor:pts.map(p=>CAT_META[p.cat].color),pointRadius:8,pointHoverRadius:11}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>`${c.raw.label} (만족 ${c.raw.y.toFixed(2)}, 불만족 -${c.raw.x.toFixed(2)})`}}},
+      scales:{
+        x:{title:{display:true,text:'불만족계수 (없을 때 불만) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}},
+        y:{title:{display:true,text:'만족계수 (있을 때 만족) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}}}},
+    plugins:[{afterDraw:ch=>{
+      const{ctx,chartArea:a,scales}=ch; const xm=scales.x.getPixelForValue(0.5),ym=scales.y.getPixelForValue(0.5);
+      ctx.save();ctx.strokeStyle='#cbd5e1';ctx.setLineDash([5,4]);ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(xm,a.top);ctx.lineTo(xm,a.bottom);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(a.left,ym);ctx.lineTo(a.right,ym);ctx.stroke();
+      ctx.setLineDash([]);ctx.font='600 12px sans-serif';ctx.fillStyle='#94a3b8';
+      ctx.fillText('매력적',a.left+10,a.top+18);
+      ctx.fillText('일원적',a.right-58,a.top+18);
+      ctx.fillText('무관심',a.left+10,a.bottom-10);
+      ctx.fillText('당연적',a.right-58,a.bottom-10);
+      ctx.fillStyle='#1a1a2e';ctx.font='600 11px sans-serif';
+      pts.forEach((p,i)=>{const px=scales.x.getPixelForValue(p.x),py=scales.y.getPixelForValue(p.y);
+        ctx.fillText(i+1,px+10,py+4);});
+      ctx.restore();
+    }}]});
+}
+
+// 예시 데이터: 자료의 분포를 대략 반영한 가짜 응답 30명
+document.getElementById('demo').addEventListener('click', async ()=>{
+  // 기능별 (긍정,부정) 응답 확률 경향 — 분류가 자료와 비슷하게 나오도록 설계
+  // 긍정 인덱스: 0든다 1당연 2별 3어쩔 4안듦 / 부정 동일
+  const profile={
+    f1:{p:[0,1],n:[4]},      // 24h: 당연적 경향
+    f2:{p:[0,1],n:[4]},      // 환불: 당연적
+    f3:{p:[0],n:[2,3]},      // 맞춤추천: 매력적
+    f4:{p:[0,1],n:[4]},      // 예약변경: 일원적/당연
+    f5:{p:[0,1],n:[4]},      // 긴급대응: 당연적
+    f6:{p:[0],n:[4]},        // 비교추천: 일원적
+    f7:{p:[2],n:[2]},        // 다국어: 무관심
+    f8:{p:[0,1],n:[4]},      // 상담원: 당연적
+    f9:{p:[0],n:[2,3]},      // 자동알림: 매력적/일원
+    f10:{p:[0],n:[2,3]},     // 개인화: 매력적
+    f11:{p:[3,4],n:[0,1]},   // 과도추천: 역품질
+  };
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const recs=[];
+  for(let n=0;n<30;n++){
+    const pos={},neg={};
+    FEATURES.forEach(f=>{ const pr=profile[f.id]; pos[f.id]=pick(pr.p); neg[f.id]=pick(pr.n); });
+    recs.push({session:SESSION_CODE,pos,neg});
+  }
+  const {error}=await supabase.from('kano_responses').insert(recs);
+  if(error) alert('예시 추가 실패: '+error.message);
+});
+document.getElementById('reset').addEventListener('click', async ()=>{
+  if(!confirm('이 세션('+SESSION_CODE+')의 모든 응답을 삭제할까요?')) return;
+  const {error}=await supabase.from('kano_responses').delete().eq('session',SESSION_CODE);
+  if(error){alert('삭제 실패: '+error.message);return;}
+  rows=[]; draw();
+});
+
+fetchAll();
+</script>
+</body>
+</html>

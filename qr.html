@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kano 설문 QR 만들기</title>
+<style>
+  body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:#f6f6fb;color:#1a1a2e;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}
+  .card{background:#fff;border:1px solid #e7e7ef;border-radius:20px;padding:32px;max-width:440px;width:100%;text-align:center}
+  h1{font-size:20px;margin:0 0 6px}
+  p{font-size:13.5px;color:#6b6b7b;margin:0 0 18px}
+  input{width:100%;padding:12px 14px;border:1.5px solid #e7e7ef;border-radius:12px;font-size:14px;margin-bottom:14px}
+  button{border:none;background:#1d4ed8;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;cursor:pointer}
+  #qr{margin-top:24px;display:flex;justify-content:center}
+  #qr img{border-radius:12px}
+  .url{font-size:12px;color:#6b6b7b;word-break:break-all;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Kano 설문 QR 만들기</h1>
+  <p>학생들이 응답할 주소(보통 사이트 첫 페이지)를 입력하세요.</p>
+  <input id="u" type="text" placeholder="https://프로젝트이름.vercel.app/">
+  <button onclick="gen()">QR 생성</button>
+  <div id="qr"></div>
+  <div class="url" id="urlout"></div>
+</div>
+<script>
+function gen(){
+  const u=document.getElementById('u').value.trim();
+  if(!u){alert('주소를 입력하세요');return;}
+  const api='https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data='+encodeURIComponent(u);
+  document.getElementById('qr').innerHTML='<img src="'+api+'" width="320" height="320" alt="설문 QR">';
+  document.getElementById('urlout').textContent=u;
+}
+// 현재 사이트 주소를 기본값으로 추정
+document.getElementById('u').value = location.origin + '/';
+</script>
+</body>
+</html>
