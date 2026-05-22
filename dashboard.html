@@ -10,29 +10,65 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
     background:var(--bg);color:var(--ink);line-height:1.55}
-  .wrap{max-width:1140px;margin:0 auto;padding:24px 20px 60px}
-  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
+  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
   .top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em}
   .top .sub{font-size:13px;color:var(--muted)}
   .live{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ok);background:#ecfdf5;padding:7px 14px;border-radius:999px}
   .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:pulse 1.4s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
-  .metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+
+  .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:18px}
+  .step-head{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+  .step-num{flex:0 0 auto;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#1d4ed8,#0ea5a4);
+    color:#fff;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .step-head h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .step-head .tag{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:1px}
+
+  .explain{background:#eef4ff;border:1px solid #d6e2ff;border-radius:12px;padding:13px 16px;
+    font-size:13px;color:#33415c;line-height:1.75;margin-top:14px}
+  .explain b{color:#1d4ed8}
+  .explain .formula{display:block;background:#fff;border:1px dashed #7c9cff;border-radius:10px;
+    padding:11px 14px;margin:9px 0;font-size:13.5px;color:#1e293b;font-weight:700;letter-spacing:-.01em}
+  .explain .ex{display:inline-block;background:#fff7ed;border-radius:6px;padding:2px 8px;font-weight:700;color:#b45309}
+
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px}
+  .metric{background:#f8faff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
   .metric .l{font-size:12.5px;color:var(--muted);margin-bottom:4px}
-  .metric .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
-  .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
-  .panel h2{margin:0 0 4px;font-size:16px;font-weight:700}
-  .panel .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px}
-  .cv{position:relative;width:100%}
+  .metric .v{font-size:26px;font-weight:800;letter-spacing:-.02em}
+
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:center}
   th{color:var(--muted);font-weight:600;font-size:12px}
   td.name{text-align:left;font-weight:600;font-size:13px}
+  .scroll{overflow-x:auto}
+
   .badge{display:inline-block;padding:3px 10px;border-radius:999px;color:#fff;font-size:12px;font-weight:700}
-  .empty{text-align:center;padding:60px 20px;color:var(--muted)}
-  .empty .big{font-size:48px;margin-bottom:10px}
-  .ctrl{display:flex;gap:8px;flex-wrap:wrap}
+
+  .kano{border-collapse:separate;border-spacing:4px;min-width:560px}
+  .kano th{background:#f1f5f9;border-radius:8px;padding:7px 6px;font-size:11.5px;color:#475569;border:none}
+  .kano td.rh{background:#f1f5f9;border-radius:8px;font-weight:700;font-size:12px;color:#475569;text-align:right;padding:8px 10px;white-space:nowrap;border:none}
+  .kano td.kc{border-radius:8px;color:#fff;font-weight:700;font-size:12px;padding:10px 6px;text-align:center;border:none}
+
+  .cat-defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;margin-top:12px}
+  .cat-def{border-left:5px solid;padding:9px 12px;background:#fafafe;border-radius:8px;font-size:12.5px;line-height:1.5}
+  .cat-def b{display:block;font-size:13px;margin-bottom:1px}
+
+  .final-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-top:4px}
+  .fc{border:1px solid var(--line);border-top:5px solid;border-radius:12px;padding:12px 14px;background:#fff}
+  .fc .fn{font-size:11px;color:var(--muted);font-weight:700}
+  .fc .ft{font-size:13.5px;font-weight:700;margin:2px 0 9px;line-height:1.35}
+
+  .prio{display:flex;align-items:center;gap:13px;padding:11px 14px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:#fff}
+  .prio .rank{flex:0 0 auto;min-width:66px;text-align:center;font-size:12px;font-weight:800;padding:6px 8px;border-radius:8px;color:#fff}
+  .prio .pinfo{flex:1;min-width:0}
+  .prio .pn{font-size:13.5px;font-weight:700}
+  .prio .pc{font-size:12px;color:var(--muted)}
+  .prio .pcoef{flex:0 0 auto;font-size:11.5px;color:var(--muted);text-align:right;line-height:1.4}
+
+  .cv{position:relative;width:100%}
+  .ph{text-align:center;color:var(--muted);padding:30px 20px;font-size:13px;background:#f8faff;border-radius:12px;margin-top:6px}
+  .ctrl{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
   .btn{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600;color:var(--ink)}
   .btn:hover{background:var(--bg)}
   .hl{background:#fff7ed}
@@ -48,9 +84,9 @@
     <div class="live"><span class="dot"></span>실시간 연결됨</div>
   </div>
 
-  <div id="content"><div class="empty"><div class="big">📡</div>학생 응답을 기다리는 중입니다…<br>학생들이 제출하면 이곳에 실시간으로 집계됩니다.</div></div>
+  <div id="content"></div>
 
-  <div style="margin-top:6px" class="ctrl">
+  <div class="ctrl">
     <button class="btn" id="demo">예시 데이터 30명 추가</button>
     <button class="btn" id="reset">이 세션 응답 전체 삭제</button>
   </div>
@@ -63,6 +99,17 @@
 document.getElementById('sess').textContent=SESSION_CODE;
 let rows=[]; let chart=null;
 
+// 개선 우선순위: 당연적1 > 일원적2 > 매력적3 > 무관심4 > 의심 > 역품질(최하)
+const PRIORITY_RANK={M:1,O:2,A:3,I:4,Q:5,R:6};
+const PRIORITY_INFO={
+  M:{label:"1순위",color:"#b45309"},
+  O:{label:"2순위",color:"#0f766e"},
+  A:{label:"3순위",color:"#2563eb"},
+  I:{label:"4순위",color:"#6b7280"},
+  Q:{label:"유의",color:"#7c3aed"},
+  R:{label:"최하순위",color:"#dc2626"},
+};
+
 async function fetchAll(){
   const {data,error}=await supabase.from('kano_responses')
     .select('*').eq('session',SESSION_CODE).order('created_at',{ascending:true});
@@ -74,84 +121,190 @@ supabase.channel('rt-kano')
     p=>{ if(p.new.session===SESSION_CODE){ rows.push(p.new); draw(); }})
   .subscribe();
 
-// 기능별 분류 카운트 + 최종분류 + 계수
 function analyze(){
   const res={};
-  FEATURES.forEach(f=>res[f.id]={A:0,O:0,M:0,I:0,R:0,Q:0});
+  FEATURES.forEach(f=>res[f.id]={A:0,O:0,M:0,I:0,R:0,Q:0,resp:0});
   rows.forEach(r=>{
     FEATURES.forEach(f=>{
       const pv=r.pos[f.id], nv=r.neg[f.id];
       if(pv==null||nv==null) return;
+      res[f.id].resp++;
       res[f.id][classify(pv,nv)]++;
     });
   });
   FEATURES.forEach(f=>{
     const c=res[f.id];
-    // 최종분류: 최빈 (A/O/M/I/R/Q 전체에서)
     let top=CAT_ORDER[0];
     CAT_ORDER.forEach(k=>{ if(c[k]>c[top]) top=k; });
     c.final=top;
-    // 계수: 분모는 A+O+M+I (R,Q 제외)
     const denom=c.A+c.O+c.M+c.I;
     c.sat = denom? (c.A+c.O)/denom : 0;
-    c.dissat = denom? (c.O+c.M)/denom : 0; // 표기는 음수
+    c.dissat = denom? (c.O+c.M)/denom : 0;
     c.total = c.A+c.O+c.M+c.I+c.R+c.Q;
   });
   return res;
 }
 
+function stepHead(num,title,tag){
+  return '<div class="step-head"><div class="step-num">'+num+'</div><div><h2>'+title+'</h2>'
+    +(tag?'<div class="tag">'+tag+'</div>':'')+'</div></div>';
+}
+function ph(msg){ return '<div class="ph">'+msg+'</div>'; }
+
+function kanoTableHtml(){
+  let h='<div class="scroll"><table class="kano"><thead>'
+    +'<tr><th></th><th colspan="5" style="background:#fff5e9;color:#b45309">부정 응답 (없을 때)</th></tr>'
+    +'<tr><th style="background:#eff4ff;color:#2563eb">긍정 ↓ / 부정 →</th>';
+  CHOICES.forEach(c=>{ h+='<th>'+c.label+'</th>'; });
+  h+='</tr></thead><tbody>';
+  KANO_TABLE.forEach((row,pi)=>{
+    h+='<tr><td class="rh">'+CHOICES[pi].label+'</td>';
+    row.forEach(code=>{ const m=CAT_META[code]; h+='<td class="kc" style="background:'+m.color+'">'+m.name+'</td>'; });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  return h;
+}
+function catDefsHtml(){
+  return '<div class="cat-defs">'+CAT_ORDER.map(k=>{const m=CAT_META[k];
+    return '<div class="cat-def" style="border-left-color:'+m.color+'"><b style="color:'+m.color+'">'
+      +m.name+' ('+m.full+')</b>'+m.desc+'</div>';
+  }).join('')+'</div>';
+}
+
 function draw(){
-  if(rows.length===0){
-    document.getElementById('content').innerHTML='<div class="empty"><div class="big">📡</div>학생 응답을 기다리는 중입니다…</div>';
-    return;
+  const has=rows.length>0;
+  const R=has?analyze():null;
+  let H='';
+
+  // STEP 1
+  H+='<div class="step">'+stepHead(1,'응답 수집','Kano 설문 데이터');
+  if(has){
+    H+='<div class="metrics">'
+      +'<div class="metric"><div class="l">현재 응답자 수</div><div class="v">'+rows.length+'명</div></div>'
+      +'<div class="metric"><div class="l">조사 기능 수</div><div class="v">'+FEATURES.length+'개</div></div>'
+      +'<div class="metric"><div class="l">수집된 응답 문항</div><div class="v">'+(rows.length*FEATURES.length*2)+'개</div></div></div>';
+    H+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th style="text-align:left">기능</th><th>응답 수</th></tr></thead><tbody>';
+    H+=FEATURES.map((f,i)=>'<tr><td class="name">'+(i+1)+'. '+f.name+'</td><td>'+R[f.id].resp+'명</td></tr>').join('');
+    H+='</tbody></table></div>';
+  } else {
+    H+=ph('아직 응답이 없습니다. 학생이 제출하거나 아래 "예시 데이터 30명 추가"를 누르면 표시됩니다.');
   }
-  const R=analyze();
-  const counts={A:0,O:0,M:0,I:0,R:0,Q:0};
-  FEATURES.forEach(f=>counts[R[f.id].final]++);
+  H+='<div class="explain">Kano 모형은 각 기능에 대해 <b>있을 때(긍정)</b>와 <b>없을 때(부정)</b> 두 가지 질문을 합니다. '
+    +'응답자는 <b>마음에 든다 / 당연하다 / 별 느낌 없다 / 어쩔 수 없다 / 마음에 들지 않는다</b> 중 하나를 선택합니다.</div>';
+  H+='</div>';
 
-  document.getElementById('content').innerHTML=`
-    <div class="metrics">
-      <div class="metric"><div class="l">응답자 수</div><div class="v">${rows.length}명</div></div>
-      <div class="metric"><div class="l">당연적 기능</div><div class="v" style="color:#b45309">${counts.M}개</div></div>
-      <div class="metric"><div class="l">일원적 기능</div><div class="v" style="color:#0f766e">${counts.O}개</div></div>
-      <div class="metric"><div class="l">매력적 기능</div><div class="v" style="color:#2563eb">${counts.A}개</div></div>
-      <div class="metric"><div class="l">역품질 기능</div><div class="v" style="color:#dc2626">${counts.R}개</div></div>
-    </div>
+  // STEP 2 (정적)
+  H+='<div class="step">'+stepHead(2,'Kano 평가표로 품질요소 분류','긍정 × 부정 조합표');
+  H+=kanoTableHtml();
+  H+='<div class="explain">긍정 응답과 부정 응답의 <b>조합</b>으로 품질 유형이 결정됩니다. '
+    +'예를 들어 <span class="ex">긍정 = \'마음에 든다\' + 부정 = \'어쩔 수 없다\' → 매력적 품질</span></div>';
+  H+=catDefsHtml();
+  H+='</div>';
 
-    <div class="panel"><h2>만족계수–불만족계수 (Kano 산점도)</h2>
-      <p class="hint">가로축은 불만족계수(없을 때 불만 정도), 세로축은 만족계수(있을 때 만족 정도). 사분면 위치로 품질 유형이 구분됩니다.</p>
-      <div class="cv" style="height:440px"><canvas id="scatter"></canvas></div></div>
+  // STEP 3
+  H+='<div class="step">'+stepHead(3,'기능별 분류 집계표','응답자 분류 카운트');
+  if(has){
+    H+='<div class="scroll"><table><thead><tr><th style="text-align:left">AI 챗봇 기능</th>'
+      +'<th>매력적</th><th>일원적</th><th>당연적</th><th>무관심</th><th>역품질</th><th>의심</th>'
+      +'<th>만족계수</th><th>불만족계수</th><th>최종 분류</th></tr></thead><tbody>';
+    H+=FEATURES.map((f,i)=>{const c=R[f.id],m=CAT_META[c.final];
+      return '<tr><td class="name">'+(i+1)+'. '+f.name+'</td>'
+        +'<td>'+c.A+'</td><td>'+c.O+'</td><td>'+c.M+'</td><td>'+c.I+'</td><td>'+c.R+'</td><td>'+c.Q+'</td>'
+        +'<td class="hl">'+c.sat.toFixed(2)+'</td><td class="hl">-'+c.dissat.toFixed(2)+'</td>'
+        +'<td><span class="badge" style="background:'+m.color+'">'+m.name+'</span></td></tr>';
+    }).join('');
+    H+='</tbody></table></div>';
+  } else { H+=ph('응답이 들어오면 기능별 분류가 집계됩니다.'); }
+  H+='<div class="explain">각 기능에 대해 응답자들의 분류를 집계합니다. <b>가장 많이 나온 유형이 최종 분류</b>가 됩니다. '
+    +'<span class="ex">예) 매력적 20명, 일원적 5명, 당연적 3명 → 최종: 매력적</span></div>';
+  H+='</div>';
 
-    <div class="panel"><h2>기능별 분류 집계표</h2>
-      <p class="hint">각 셀은 해당 분류로 응답한 인원입니다. 가장 많은 유형이 최종 분류가 됩니다.</p>
-      <div style="overflow-x:auto"><table>
-        <thead><tr><th style="text-align:left">AI 챗봇 기능</th>
-          <th>매력적</th><th>일원적</th><th>당연적</th><th>무관심</th><th>역품질</th><th>의심</th>
-          <th>만족계수</th><th>불만족계수</th><th>최종 분류</th></tr></thead>
-        <tbody id="tb"></tbody></table></div></div>`;
+  // STEP 4
+  H+='<div class="step">'+stepHead(4,'최빈값 기준 최종 분류 결과','11개 기능 한눈에');
+  if(has){
+    H+='<div class="final-cards">'+FEATURES.map((f,i)=>{const c=R[f.id],m=CAT_META[c.final];
+      return '<div class="fc" style="border-top-color:'+m.color+'"><div class="fn">기능 '+(i+1)+'</div>'
+        +'<div class="ft">'+f.name+'</div>'
+        +'<div><span class="badge" style="background:'+m.color+'">'+m.name+'</span> '
+        +'<span style="font-size:12px;color:var(--muted)">'+c[c.final]+'/'+c.total+'명</span></div></div>';
+    }).join('')+'</div>';
+  } else { H+=ph('응답이 들어오면 기능별 최종 분류 카드가 표시됩니다.'); }
+  H+='<div class="explain"><b>최빈값</b>(가장 많이 나온 분류)을 기준으로 각 기능의 품질 유형을 결정합니다.</div>';
+  H+='</div>';
 
-  document.getElementById('tb').innerHTML=FEATURES.map(f=>{
-    const c=R[f.id], m=CAT_META[c.final];
-    return `<tr><td class="name">${f.name}</td>
-      <td>${c.A}</td><td>${c.O}</td><td>${c.M}</td><td>${c.I}</td>
-      <td>${c.R}</td><td>${c.Q}</td>
-      <td class="hl">${c.sat.toFixed(2)}</td>
-      <td class="hl">-${c.dissat.toFixed(2)}</td>
-      <td><span class="badge" style="background:${m.color}">${m.name}</span></td></tr>`;
-  }).join('');
+  // STEP 5
+  H+='<div class="step">'+stepHead(5,'만족계수 · 불만족계수','Better–Worse 계수');
+  H+='<div class="explain">'
+    +'<span class="formula">만족계수 = (매력적 + 일원적) ÷ (매력적 + 일원적 + 당연적 + 무관심)</span>'
+    +'<span class="formula">불만족계수 = −(일원적 + 당연적) ÷ (매력적 + 일원적 + 당연적 + 무관심)</span>'
+    +'<b>만족계수</b>는 이 기능이 <b>있을 때 만족</b>을 얼마나 높이는지, <b>불만족계수</b>는 <b>없을 때 불만</b>이 얼마나 커지는지를 나타냅니다.<br>'
+    +'· 만족계수가 높을수록 → <b>있으면 좋은 기능</b><br>· 불만족계수가 클수록(절댓값) → <b>없으면 문제되는 기능</b></div>';
+  if(has){
+    const sorted=FEATURES.slice().sort((a,b)=>R[b.id].sat-R[a.id].sat);
+    H+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th style="text-align:left">기능 (만족계수 높은 순)</th><th>만족계수</th><th>불만족계수</th></tr></thead><tbody>';
+    H+=sorted.map(f=>{const c=R[f.id];const idx=FEATURES.indexOf(f)+1;
+      return '<tr><td class="name">'+idx+'. '+f.name+'</td><td class="hl">'+c.sat.toFixed(2)+'</td><td class="hl">-'+c.dissat.toFixed(2)+'</td></tr>';
+    }).join('');
+    H+='</tbody></table></div>';
+  } else { H+=ph('응답이 들어오면 계수가 계산됩니다.'); }
+  H+='</div>';
 
-  drawScatter(R);
+  // STEP 6
+  H+='<div class="step">'+stepHead(6,'Kano 산점도','만족–불만족 사분면');
+  if(has){ H+='<div class="cv" style="height:460px"><canvas id="scatter"></canvas></div>'; }
+  else { H+=ph('응답이 들어오면 산점도가 그려집니다.'); }
+  H+='<div class="explain">가로축 = <b>불만족계수</b>, 세로축 = <b>만족계수</b>.<br>'
+    +'· <b>왼쪽 위 (매력적)</b>: 있으면 감동, 없어도 불만 적음 → 차별화 요소<br>'
+    +'· <b>오른쪽 위 (일원적)</b>: 잘할수록 만족, 못하면 불만 → 성능 개선<br>'
+    +'· <b>오른쪽 아래 (당연적)</b>: 없으면 큰 불만, 있어도 당연 → 기본 제공 필수<br>'
+    +'· <b>왼쪽 아래 (무관심)</b>: 영향 없음 → 후순위</div>';
+  H+='</div>';
+
+  // STEP 7
+  H+='<div class="step">'+stepHead(7,'개선 우선순위 결정','실행 전략');
+  if(has){
+    const order=FEATURES.slice().sort((a,b)=>{
+      const ra=PRIORITY_RANK[R[a.id].final], rb=PRIORITY_RANK[R[b.id].final];
+      if(ra!==rb) return ra-rb;
+      return R[b.id].dissat - R[a.id].dissat;
+    });
+    H+=order.map(f=>{const c=R[f.id],m=CAT_META[c.final],pi=PRIORITY_INFO[c.final];const idx=FEATURES.indexOf(f)+1;
+      return '<div class="prio"><div class="rank" style="background:'+pi.color+'">'+pi.label+'</div>'
+        +'<div class="pinfo"><div class="pn">'+idx+'. '+f.name+'</div><div class="pc">'+m.name+' · '+m.desc+'</div></div>'
+        +'<div class="pcoef">만족 '+c.sat.toFixed(2)+'<br>불만족 -'+c.dissat.toFixed(2)+'</div></div>';
+    }).join('');
+  } else { H+=ph('응답이 들어오면 우선순위가 정렬됩니다.'); }
+  H+='<div class="explain"><b>당연적</b> 품질은 없으면 고객이 떠납니다. 먼저 당연적 기능을 완벽하게 갖추고, '
+    +'그 다음 <b>일원적</b> 기능의 성능을 높이며, <b>매력적</b> 기능으로 경쟁사와 차별화합니다. '
+    +'<b>역품질</b> 기능은 제거하거나 선택형으로 바꿔야 합니다.<br>'
+    +'<span class="ex">1순위 당연적 → 2순위 일원적 → 3순위 매력적 → 4순위 무관심 → 최하 역품질</span></div>';
+  H+='</div>';
+
+  document.getElementById('content').innerHTML=H;
+  if(has) drawScatter(R);
 }
 
 function drawScatter(R){
-  const pts=FEATURES.map((f,i)=>({x:R[f.id].dissat, y:R[f.id].sat, label:(i+1)+'. '+f.name, cat:R[f.id].final}));
+  // 같은 좌표에 몰린 점은 작은 원으로 흩어지게(jitter) 처리 — 겹침 방지
+  const groups={};
+  FEATURES.forEach((f,i)=>{ const key=R[f.id].dissat.toFixed(2)+'|'+R[f.id].sat.toFixed(2); (groups[key]=groups[key]||[]).push(i); });
+  const off={};
+  Object.values(groups).forEach(idxs=>{
+    if(idxs.length===1){ off[idxs[0]]={dx:0,dy:0}; }
+    else { idxs.forEach((i,k)=>{ const ang=2*Math.PI*k/idxs.length; off[i]={dx:0.03*Math.cos(ang),dy:0.03*Math.sin(ang)}; }); }
+  });
+  const pts=FEATURES.map((f,i)=>{
+    let x=R[f.id].dissat+off[i].dx, y=R[f.id].sat+off[i].dy;
+    x=Math.max(0,Math.min(1,x)); y=Math.max(0,Math.min(1,y));
+    return {x:x,y:y,n:i+1,label:(i+1)+'. '+f.name,cat:R[f.id].final};
+  });
   if(chart) chart.destroy();
   chart=new Chart(document.getElementById('scatter'),{type:'scatter',
-    data:{datasets:[{data:pts,
-      backgroundColor:pts.map(p=>CAT_META[p.cat].color),pointRadius:8,pointHoverRadius:11}]},
+    data:{datasets:[{data:pts,backgroundColor:pts.map(p=>CAT_META[p.cat].color),pointRadius:9,pointHoverRadius:12}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},
-        tooltip:{callbacks:{label:c=>`${c.raw.label} (만족 ${c.raw.y.toFixed(2)}, 불만족 -${c.raw.x.toFixed(2)})`}}},
+        tooltip:{callbacks:{label:c=>c.raw.label+' (만족 '+c.raw.y.toFixed(2)+', 불만족 -'+c.raw.x.toFixed(2)+')'}}},
       scales:{
         x:{title:{display:true,text:'불만족계수 (없을 때 불만) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}},
         y:{title:{display:true,text:'만족계수 (있을 때 만족) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}}}},
@@ -165,35 +318,23 @@ function drawScatter(R){
       ctx.fillText('일원적',a.right-58,a.top+18);
       ctx.fillText('무관심',a.left+10,a.bottom-10);
       ctx.fillText('당연적',a.right-58,a.bottom-10);
-      ctx.fillStyle='#1a1a2e';ctx.font='600 11px sans-serif';
-      pts.forEach((p,i)=>{const px=scales.x.getPixelForValue(p.x),py=scales.y.getPixelForValue(p.y);
-        ctx.fillText(i+1,px+10,py+4);});
+      ctx.fillStyle='#1a1a2e';ctx.font='700 11px sans-serif';
+      pts.forEach(p=>{const px=scales.x.getPixelForValue(p.x),py=scales.y.getPixelForValue(p.y);
+        ctx.fillText(p.n,px+11,py+4);});
       ctx.restore();
     }}]});
 }
 
-// 예시 데이터: 자료의 분포를 대략 반영한 가짜 응답 30명
 document.getElementById('demo').addEventListener('click', async ()=>{
-  // 기능별 (긍정,부정) 응답 확률 경향 — 분류가 자료와 비슷하게 나오도록 설계
-  // 긍정 인덱스: 0든다 1당연 2별 3어쩔 4안듦 / 부정 동일
   const profile={
-    f1:{p:[0,1],n:[4]},      // 24h: 당연적 경향
-    f2:{p:[0,1],n:[4]},      // 환불: 당연적
-    f3:{p:[0],n:[2,3]},      // 맞춤추천: 매력적
-    f4:{p:[0,1],n:[4]},      // 예약변경: 일원적/당연
-    f5:{p:[0,1],n:[4]},      // 긴급대응: 당연적
-    f6:{p:[0],n:[4]},        // 비교추천: 일원적
-    f7:{p:[2],n:[2]},        // 다국어: 무관심
-    f8:{p:[0,1],n:[4]},      // 상담원: 당연적
-    f9:{p:[0],n:[2,3]},      // 자동알림: 매력적/일원
-    f10:{p:[0],n:[2,3]},     // 개인화: 매력적
-    f11:{p:[3,4],n:[0,1]},   // 과도추천: 역품질
+    f1:{p:[0,1],n:[4]}, f2:{p:[0,1],n:[4]}, f3:{p:[0],n:[2,3]}, f4:{p:[0,1],n:[4]},
+    f5:{p:[0,1],n:[4]}, f6:{p:[0],n:[4]}, f7:{p:[2],n:[2]}, f8:{p:[0,1],n:[4]},
+    f9:{p:[0],n:[2,3]}, f10:{p:[0],n:[2,3]}, f11:{p:[3,4],n:[0,1]},
   };
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const recs=[];
-  for(let n=0;n<30;n++){
-    const pos={},neg={};
-    FEATURES.forEach(f=>{ const pr=profile[f.id]; pos[f.id]=pick(pr.p); neg[f.id]=pick(pr.n); });
+  for(let n=0;n<30;n++){ const pos={},neg={};
+    FEATURES.forEach(f=>{const pr=profile[f.id]; pos[f.id]=pick(pr.p); neg[f.id]=pick(pr.n);});
     recs.push({session:SESSION_CODE,pos,neg});
   }
   const {error}=await supabase.from('kano_responses').insert(recs);
