@@ -72,6 +72,30 @@
   .btn{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600;color:var(--ink)}
   .btn:hover{background:var(--bg)}
   .hl{background:#fff7ed}
+
+  /* 5단계: 만족·불만족계수 학생용 카드/예시 */
+  .coef-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .coef-card{border-radius:14px;padding:16px 18px;border:1px solid}
+  .coef-card.blue{background:#eff4ff;border-color:#bfd3ff}
+  .coef-card.red{background:#fef2f2;border-color:#fbcccc}
+  .coef-card .cc-t{font-size:17px;font-weight:800;margin-bottom:6px}
+  .coef-card.blue .cc-t{color:#1d4ed8}
+  .coef-card.red .cc-t{color:#dc2626}
+  .coef-card .cc-q{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.5}
+  .coef-card .cc-l{font-size:12.5px;color:#475569;line-height:1.75}
+  .combo td,.combo th{text-align:center}
+  .combo td:nth-child(3){text-align:left;color:#475569}
+  .ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .ex-box{border-radius:12px;padding:14px 16px;border:1px solid}
+  .ex-box.red{background:#fef2f2;border-color:#fbcccc}
+  .ex-box.blue{background:#eff4ff;border-color:#bfd3ff}
+  .ex-box .eb-t{font-size:14px;font-weight:800;margin-bottom:8px}
+  .ex-box .eb-l{font-size:12.5px;color:#475569;line-height:1.75}
+  .ex-box .eb-r{font-size:13px;font-weight:700;margin-top:8px;color:var(--ink)}
+  .formula-toggle{margin-top:14px;font-size:12.5px}
+  .formula-toggle summary{cursor:pointer;color:var(--muted);font-weight:600;user-select:none}
+  .formula-toggle .formula-body{background:#f8faff;border:1px dashed #94a3b8;border-radius:8px;padding:10px 13px;margin-top:8px;color:#475569;line-height:1.8}
+  @media(max-width:620px){.coef-cards,.ex-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -234,15 +258,42 @@ function draw(){
   H+='</div>';
 
   // STEP 5
-  H+='<div class="step">'+stepHead(5,'만족계수 · 불만족계수','Better–Worse 계수');
-  H+='<div class="explain">'
-    +'<span class="formula">만족계수 = (매력적 + 일원적) ÷ (매력적 + 일원적 + 당연적 + 무관심)</span>'
-    +'<span class="formula">불만족계수 = −(일원적 + 당연적) ÷ (매력적 + 일원적 + 당연적 + 무관심)</span>'
-    +'<b>만족계수</b>는 이 기능이 <b>있을 때 만족</b>을 얼마나 높이는지, <b>불만족계수</b>는 <b>없을 때 불만</b>이 얼마나 커지는지를 나타냅니다.<br>'
-    +'· 만족계수가 높을수록 → <b>있으면 좋은 기능</b><br>· 불만족계수가 클수록(절댓값) → <b>없으면 문제되는 기능</b></div>';
+  H+='<div class="step">'+stepHead(5,'만족계수 · 불만족계수','쉽게 이해하기');
+  // 두 계수 카드
+  H+='<div class="coef-cards">'
+    +'<div class="coef-card blue"><div class="cc-t">😊 만족계수</div>'
+    +'<div class="cc-q">"이 기능이 생기면 고객이 얼마나 기뻐할까?"</div>'
+    +'<div class="cc-l"><b>0</b>에 가까울수록 → 생겨도 별 반응 없음</div>'
+    +'<div class="cc-l"><b>1</b>에 가까울수록 → 생기면 매우 기뻐함</div></div>'
+    +'<div class="coef-card red"><div class="cc-t">😤 불만족계수</div>'
+    +'<div class="cc-q">"이 기능이 없으면 고객이 얼마나 화낼까?"</div>'
+    +'<div class="cc-l"><b>0</b>에 가까울수록 → 없어도 별로 안 화남</div>'
+    +'<div class="cc-l"><b>-1</b>에 가까울수록 → 없으면 매우 화남</div></div></div>';
+  // 두 계수 조합 → 품질 유형
+  H+='<div class="explain"><div style="font-weight:700;font-size:13.5px;margin-bottom:9px">💡 두 계수를 같이 보면 품질 유형을 알 수 있습니다</div>'
+    +'<div class="scroll"><table class="combo"><thead><tr><th>만족계수</th><th>불만족계수</th><th>의미</th><th>품질 유형</th></tr></thead><tbody>'
+    +'<tr><td>높음</td><td>낮음</td><td>있으면 기쁨, 없어도 괜찮</td><td><span class="badge" style="background:'+CAT_META.A.color+'">매력적</span></td></tr>'
+    +'<tr><td>높음</td><td>높음</td><td>있으면 기쁨, 없으면 화남</td><td><span class="badge" style="background:'+CAT_META.O.color+'">일원적</span></td></tr>'
+    +'<tr><td>낮음</td><td>높음</td><td>있어도 당연, 없으면 화남</td><td><span class="badge" style="background:'+CAT_META.M.color+'">당연적</span></td></tr>'
+    +'<tr><td>낮음</td><td>낮음</td><td>있으나 없으나 무관심</td><td><span class="badge" style="background:'+CAT_META.I.color+'">무관심</span></td></tr>'
+    +'</tbody></table></div></div>';
+  // 실제 예시 2개
+  H+='<div class="ex-grid">'
+    +'<div class="ex-box red"><div class="eb-t">📌 취소·환불 안내</div>'
+    +'<div class="eb-l">있을 때: "당연한 거지" → 기뻐하는 사람 적음</div>'
+    +'<div class="eb-l">없을 때: "이게 없어?!" → 화내는 사람 매우 많음</div>'
+    +'<div class="eb-r">→ 만족계수 낮음(0.37) + 불만족계수 높음(-0.85) = <b>당연적</b></div></div>'
+    +'<div class="ex-box blue"><div class="eb-t">📌 AI 맞춤 여행 추천</div>'
+    +'<div class="eb-l">있을 때: "오 대박이다!" → 기뻐하는 사람 매우 많음</div>'
+    +'<div class="eb-l">없을 때: "원래 없던 기능이니까" → 화내는 사람 적음</div>'
+    +'<div class="eb-r">→ 만족계수 높음(1.00) + 불만족계수 낮음(-0.00) = <b>매력적</b></div></div></div>';
+  // 수식 토글 (접기/펼치기)
+  H+='<details class="formula-toggle"><summary>🔢 수식이 궁금하다면 (클릭해서 펼치기)</summary>'
+    +'<div class="formula-body">만족계수 = (매력적 + 일원적) ÷ 전체응답<br>불만족계수 = -(일원적 + 당연적) ÷ 전체응답</div></details>';
+  // 기존 만족계수순 표 유지
   if(has){
     const sorted=FEATURES.slice().sort((a,b)=>R[b.id].sat-R[a.id].sat);
-    H+='<div class="scroll" style="margin-top:12px"><table><thead><tr><th style="text-align:left">기능 (만족계수 높은 순)</th><th>만족계수</th><th>불만족계수</th></tr></thead><tbody>';
+    H+='<div class="scroll" style="margin-top:10px"><table><thead><tr><th style="text-align:left">기능 (만족계수 높은 순)</th><th>만족계수</th><th>불만족계수</th></tr></thead><tbody>';
     H+=sorted.map(f=>{const c=R[f.id];const idx=FEATURES.indexOf(f)+1;
       return '<tr><td class="name">'+idx+'. '+f.name+'</td><td class="hl">'+c.sat.toFixed(2)+'</td><td class="hl">-'+c.dissat.toFixed(2)+'</td></tr>';
     }).join('');
