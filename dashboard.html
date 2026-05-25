@@ -117,11 +117,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="config.js"></script>
 <script>
 document.getElementById('sess').textContent=SESSION_CODE;
-let rows=[]; let chart=null;
+let rows=[];
 
 // 개선 우선순위: 당연적1 > 일원적2 > 매력적3 > 무관심4 > 의심 > 역품질(최하)
 const PRIORITY_RANK={M:1,O:2,A:3,I:4,Q:5,R:6};
@@ -231,11 +230,10 @@ function draw(){
   if(has){
     H+='<div class="scroll"><table><thead><tr><th style="text-align:left">AI 챗봇 기능</th>'
       +'<th>매력적</th><th>일원적</th><th>당연적</th><th>무관심</th><th>역품질</th><th>의심</th>'
-      +'<th>만족계수</th><th>불만족계수</th><th>최종 분류</th></tr></thead><tbody>';
+      +'<th>최종 분류</th></tr></thead><tbody>';
     H+=FEATURES.map((f,i)=>{const c=R[f.id],m=CAT_META[c.final];
       return '<tr><td class="name">'+(i+1)+'. '+f.name+'</td>'
         +'<td>'+c.A+'</td><td>'+c.O+'</td><td>'+c.M+'</td><td>'+c.I+'</td><td>'+c.R+'</td><td>'+c.Q+'</td>'
-        +'<td class="hl">'+c.sat.toFixed(2)+'</td><td class="hl">-'+c.dissat.toFixed(2)+'</td>'
         +'<td><span class="badge" style="background:'+m.color+'">'+m.name+'</span></td></tr>';
     }).join('');
     H+='</tbody></table></div>';
@@ -257,63 +255,8 @@ function draw(){
   H+='<div class="explain"><b>최빈값</b>(가장 많이 나온 분류)을 기준으로 각 기능의 품질 유형을 결정합니다.</div>';
   H+='</div>';
 
-  // STEP 5
-  H+='<div class="step">'+stepHead(5,'만족계수 · 불만족계수','쉽게 이해하기');
-  // 두 계수 카드
-  H+='<div class="coef-cards">'
-    +'<div class="coef-card blue"><div class="cc-t">😊 만족계수</div>'
-    +'<div class="cc-q">"이 기능이 생기면 고객이 얼마나 기뻐할까?"</div>'
-    +'<div class="cc-l"><b>0</b>에 가까울수록 → 생겨도 별 반응 없음</div>'
-    +'<div class="cc-l"><b>1</b>에 가까울수록 → 생기면 매우 기뻐함</div></div>'
-    +'<div class="coef-card red"><div class="cc-t">😤 불만족계수</div>'
-    +'<div class="cc-q">"이 기능이 없으면 고객이 얼마나 화낼까?"</div>'
-    +'<div class="cc-l"><b>0</b>에 가까울수록 → 없어도 별로 안 화남</div>'
-    +'<div class="cc-l"><b>-1</b>에 가까울수록 → 없으면 매우 화남</div></div></div>';
-  // 두 계수 조합 → 품질 유형
-  H+='<div class="explain"><div style="font-weight:700;font-size:13.5px;margin-bottom:9px">💡 두 계수를 같이 보면 품질 유형을 알 수 있습니다</div>'
-    +'<div class="scroll"><table class="combo"><thead><tr><th>만족계수</th><th>불만족계수</th><th>의미</th><th>품질 유형</th></tr></thead><tbody>'
-    +'<tr><td>높음</td><td>낮음</td><td>있으면 기쁨, 없어도 괜찮</td><td><span class="badge" style="background:'+CAT_META.A.color+'">매력적</span></td></tr>'
-    +'<tr><td>높음</td><td>높음</td><td>있으면 기쁨, 없으면 화남</td><td><span class="badge" style="background:'+CAT_META.O.color+'">일원적</span></td></tr>'
-    +'<tr><td>낮음</td><td>높음</td><td>있어도 당연, 없으면 화남</td><td><span class="badge" style="background:'+CAT_META.M.color+'">당연적</span></td></tr>'
-    +'<tr><td>낮음</td><td>낮음</td><td>있으나 없으나 무관심</td><td><span class="badge" style="background:'+CAT_META.I.color+'">무관심</span></td></tr>'
-    +'</tbody></table></div></div>';
-  // 실제 예시 2개
-  H+='<div class="ex-grid">'
-    +'<div class="ex-box red"><div class="eb-t">📌 취소·환불 안내</div>'
-    +'<div class="eb-l">있을 때: "당연한 거지" → 기뻐하는 사람 적음</div>'
-    +'<div class="eb-l">없을 때: "이게 없어?!" → 화내는 사람 매우 많음</div>'
-    +'<div class="eb-r">→ 만족계수 낮음(0.37) + 불만족계수 높음(-0.85) = <b>당연적</b></div></div>'
-    +'<div class="ex-box blue"><div class="eb-t">📌 AI 맞춤 여행 추천</div>'
-    +'<div class="eb-l">있을 때: "오 대박이다!" → 기뻐하는 사람 매우 많음</div>'
-    +'<div class="eb-l">없을 때: "원래 없던 기능이니까" → 화내는 사람 적음</div>'
-    +'<div class="eb-r">→ 만족계수 높음(1.00) + 불만족계수 낮음(-0.00) = <b>매력적</b></div></div></div>';
-  // 수식 토글 (접기/펼치기)
-  H+='<details class="formula-toggle"><summary>🔢 수식이 궁금하다면 (클릭해서 펼치기)</summary>'
-    +'<div class="formula-body">만족계수 = (매력적 + 일원적) ÷ 전체응답<br>불만족계수 = -(일원적 + 당연적) ÷ 전체응답</div></details>';
-  // 기존 만족계수순 표 유지
-  if(has){
-    const sorted=FEATURES.slice().sort((a,b)=>R[b.id].sat-R[a.id].sat);
-    H+='<div class="scroll" style="margin-top:10px"><table><thead><tr><th style="text-align:left">기능 (만족계수 높은 순)</th><th>만족계수</th><th>불만족계수</th></tr></thead><tbody>';
-    H+=sorted.map(f=>{const c=R[f.id];const idx=FEATURES.indexOf(f)+1;
-      return '<tr><td class="name">'+idx+'. '+f.name+'</td><td class="hl">'+c.sat.toFixed(2)+'</td><td class="hl">-'+c.dissat.toFixed(2)+'</td></tr>';
-    }).join('');
-    H+='</tbody></table></div>';
-  } else { H+=ph('응답이 들어오면 계수가 계산됩니다.'); }
-  H+='</div>';
-
-  // STEP 6
-  H+='<div class="step">'+stepHead(6,'Kano 산점도','만족–불만족 사분면');
-  if(has){ H+='<div class="cv" style="height:460px"><canvas id="scatter"></canvas></div>'; }
-  else { H+=ph('응답이 들어오면 산점도가 그려집니다.'); }
-  H+='<div class="explain">가로축 = <b>불만족계수</b>, 세로축 = <b>만족계수</b>.<br>'
-    +'· <b>왼쪽 위 (매력적)</b>: 있으면 감동, 없어도 불만 적음 → 차별화 요소<br>'
-    +'· <b>오른쪽 위 (일원적)</b>: 잘할수록 만족, 못하면 불만 → 성능 개선<br>'
-    +'· <b>오른쪽 아래 (당연적)</b>: 없으면 큰 불만, 있어도 당연 → 기본 제공 필수<br>'
-    +'· <b>왼쪽 아래 (무관심)</b>: 영향 없음 → 후순위</div>';
-  H+='</div>';
-
-  // STEP 7
-  H+='<div class="step">'+stepHead(7,'개선 우선순위 결정','실행 전략');
+  // STEP 5 (개선 우선순위)
+  H+='<div class="step">'+stepHead(5,'개선 우선순위 결정','실행 전략');
   if(has){
     const order=FEATURES.slice().sort((a,b)=>{
       const ra=PRIORITY_RANK[R[a.id].final], rb=PRIORITY_RANK[R[b.id].final];
@@ -322,8 +265,7 @@ function draw(){
     });
     H+=order.map(f=>{const c=R[f.id],m=CAT_META[c.final],pi=PRIORITY_INFO[c.final];const idx=FEATURES.indexOf(f)+1;
       return '<div class="prio"><div class="rank" style="background:'+pi.color+'">'+pi.label+'</div>'
-        +'<div class="pinfo"><div class="pn">'+idx+'. '+f.name+'</div><div class="pc">'+m.name+' · '+m.desc+'</div></div>'
-        +'<div class="pcoef">만족 '+c.sat.toFixed(2)+'<br>불만족 -'+c.dissat.toFixed(2)+'</div></div>';
+        +'<div class="pinfo"><div class="pn">'+idx+'. '+f.name+'</div><div class="pc">'+m.name+' · '+m.desc+'</div></div></div>';
     }).join('');
   } else { H+=ph('응답이 들어오면 우선순위가 정렬됩니다.'); }
   H+='<div class="explain"><b>당연적</b> 품질은 없으면 고객이 떠납니다. 먼저 당연적 기능을 완벽하게 갖추고, '
@@ -333,47 +275,6 @@ function draw(){
   H+='</div>';
 
   document.getElementById('content').innerHTML=H;
-  if(has) drawScatter(R);
-}
-
-function drawScatter(R){
-  // 같은 좌표에 몰린 점은 작은 원으로 흩어지게(jitter) 처리 — 겹침 방지
-  const groups={};
-  FEATURES.forEach((f,i)=>{ const key=R[f.id].dissat.toFixed(2)+'|'+R[f.id].sat.toFixed(2); (groups[key]=groups[key]||[]).push(i); });
-  const off={};
-  Object.values(groups).forEach(idxs=>{
-    if(idxs.length===1){ off[idxs[0]]={dx:0,dy:0}; }
-    else { idxs.forEach((i,k)=>{ const ang=2*Math.PI*k/idxs.length; off[i]={dx:0.03*Math.cos(ang),dy:0.03*Math.sin(ang)}; }); }
-  });
-  const pts=FEATURES.map((f,i)=>{
-    let x=R[f.id].dissat+off[i].dx, y=R[f.id].sat+off[i].dy;
-    x=Math.max(0,Math.min(1,x)); y=Math.max(0,Math.min(1,y));
-    return {x:x,y:y,n:i+1,label:(i+1)+'. '+f.name,cat:R[f.id].final};
-  });
-  if(chart) chart.destroy();
-  chart=new Chart(document.getElementById('scatter'),{type:'scatter',
-    data:{datasets:[{data:pts,backgroundColor:pts.map(p=>CAT_META[p.cat].color),pointRadius:9,pointHoverRadius:12}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},
-        tooltip:{callbacks:{label:c=>c.raw.label+' (만족 '+c.raw.y.toFixed(2)+', 불만족 -'+c.raw.x.toFixed(2)+')'}}},
-      scales:{
-        x:{title:{display:true,text:'불만족계수 (없을 때 불만) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}},
-        y:{title:{display:true,text:'만족계수 (있을 때 만족) →',font:{size:13}},min:0,max:1,ticks:{font:{size:12}}}}},
-    plugins:[{afterDraw:ch=>{
-      const{ctx,chartArea:a,scales}=ch; const xm=scales.x.getPixelForValue(0.5),ym=scales.y.getPixelForValue(0.5);
-      ctx.save();ctx.strokeStyle='#cbd5e1';ctx.setLineDash([5,4]);ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(xm,a.top);ctx.lineTo(xm,a.bottom);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(a.left,ym);ctx.lineTo(a.right,ym);ctx.stroke();
-      ctx.setLineDash([]);ctx.font='600 12px sans-serif';ctx.fillStyle='#94a3b8';
-      ctx.fillText('매력적',a.left+10,a.top+18);
-      ctx.fillText('일원적',a.right-58,a.top+18);
-      ctx.fillText('무관심',a.left+10,a.bottom-10);
-      ctx.fillText('당연적',a.right-58,a.bottom-10);
-      ctx.fillStyle='#1a1a2e';ctx.font='700 11px sans-serif';
-      pts.forEach(p=>{const px=scales.x.getPixelForValue(p.x),py=scales.y.getPixelForValue(p.y);
-        ctx.fillText(p.n,px+11,py+4);});
-      ctx.restore();
-    }}]});
 }
 
 document.getElementById('demo').addEventListener('click', async ()=>{
